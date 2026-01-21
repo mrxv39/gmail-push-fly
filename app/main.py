@@ -1,13 +1,8 @@
 
 
-import os
-from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi import FastAPI, Request
 
 app = FastAPI()
-
-
-def _push_secret() -> str:
-    return os.getenv("PUSH_SECRET", "")
 
 
 @app.get("/health")
@@ -16,12 +11,7 @@ def health():
 
 
 @app.post("/gmail/push")
-async def gmail_push(req: Request, x_push_secret: str | None = Header(default=None)):
-    secret = _push_secret()
-    if secret and x_push_secret != secret:
-        raise HTTPException(status_code=401, detail="bad secret")
-
-    # Por ahora solo logeamos el payload; luego aquí conectaremos Gmail API.
+async def gmail_push(req: Request):
     try:
         payload = await req.json()
     except Exception:
